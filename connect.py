@@ -21,7 +21,7 @@ from io import open as copen
 import uuid
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
-if django.get_version() != '1.6':
+if not django.get_version().startswith('1.6'):
     setup = django.setup()
 from django.contrib.sessions.models import Session
 from jumpserver.api import ServerError, User, Asset, PermRole, AssetGroup, get_object, mkdir, get_asset_info
@@ -33,7 +33,10 @@ from jperm.ansible_api import MyRunner
 from jlog.models import ExecLog, FileLog
 
 login_user = get_object(User, username=getpass.getuser())
-remote_ip = os.popen("who -m | awk '{ print $NF }'").read().strip('()\n')
+try:
+    remote_ip = os.environ.get('SSH_CLIENT').split()[0]
+except (IndexError, AttributeError):
+    remote_ip = os.popen("who -m | awk '{ print $NF }'").read().strip('()\n')
 
 try:
     import termios
@@ -412,7 +415,10 @@ class SshTty(Tty):
                         pass
 
                 if sys.stdin in r:
-                    x = os.read(sys.stdin.fileno(), 4096)
+                    try:
+                        x = os.read(sys.stdin.fileno(), 4096)
+                    except OSError:
+                        pass
                     input_mode = True
                     if str(x) in ['\r', '\n', '\r\n']:
                         if self.vim_flag:
@@ -800,7 +806,7 @@ def main():
                     color_print('请输入正确ID', 'red')
                 except ServerError, e:
                     color_print(e, 'red')
-    except Exception, e:
+    except IndexError, e:
         color_print(e)
         time.sleep(5)
         pass
