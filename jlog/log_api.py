@@ -6,7 +6,10 @@ from contextlib import closing
 from io import open as copen
 from json import dumps
 from math import ceil
+import datetime
+import time
 import re
+import os
 from os.path import basename, dirname, exists, join
 from struct import unpack
 from subprocess import Popen
@@ -16,7 +19,8 @@ from tempfile import NamedTemporaryFile
 from jinja2 import FileSystemLoader, Template
 from jinja2.environment import Environment
 
-from jumpserver.api import BASE_DIR
+from jumpserver.api import BASE_DIR, logger
+from jlog.models import Log
 
 
 DEFAULT_TEMPLATE = join(BASE_DIR, 'templates', 'jlog', 'static.jinja2')
@@ -74,4 +78,44 @@ def renderTemplate(script_path, time_file_path, dimensions=(24, 80), templatenam
 
     return rendered
 
+
+def renderJSON(script_path, time_file_path):
+    with copen(script_path, encoding='utf-8', errors='replace', newline='\r\n') as scriptf:
+    # with open(script_path) as scriptf:
+        with open(time_file_path) as timef:
+            timing = getTiming(timef)
+            ret = {}
+            with closing(scriptf):
+                scriptf.readline()  # ignore first header line from script file
+                offset = 0
+                for t in timing:
+                    dt = scriptf.read(t[1])
+                    offset += t[0]
+                    ret[str(offset/float(1000))] = dt.decode('utf-8', 'replace')
+    return dumps(ret)
+
+def kill_invalid_connection():
+    unfinished_logs = Log.objects.filter(is_finished=False)
+    now = datetime.datetime.now()
+    now_timestamp = int(time.mktime(now.timetuple()))
+
+    for log in unfinished_logs:
+        try:
+            log_file_mtime = int(os.stat('%s.log' % log.log_path).st_mtime)
+        except OSError:
+            log_file_mtime = 0
+
+        if (now_timestamp - log_file_mtime) > 3600:
+            if log.login_type == 'ssh':
+                try:
+                    os.kill(int(log.pid), 9)
+                except OSError:
+                    pass
+            elif (now - log.start_time).days < 1:
+                continue
+
+            log.is_finished = True
+            log.end_time = now
+            log.save()
+            logger.warn('kill log %s' % log.log_path)
 

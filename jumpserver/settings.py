@@ -33,6 +33,11 @@ EMAIL_PORT = config.get('mail', 'email_port')
 EMAIL_HOST_USER = config.get('mail', 'email_host_user')
 EMAIL_HOST_PASSWORD = config.get('mail', 'email_host_password')
 EMAIL_USE_TLS = config.getboolean('mail', 'email_use_tls')
+try:
+    EMAIL_USE_SSL = config.getboolean('mail', 'email_use_ssl')
+except ConfigParser.NoOptionError:
+    EMAIL_USE_SSL = False
+EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend' if EMAIL_USE_SSL else 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_TIMEOUT = 5
 
 # ======== Log ==========
@@ -41,7 +46,14 @@ SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys/role_keys')
 KEY = config.get('base', 'key')
 URL = config.get('base', 'url')
 LOG_LEVEL = config.get('base', 'log')
-WEB_SOCKET_HOST = config.get('websocket', 'web_socket_host')
+IP = config.get('base', 'ip')
+PORT = config.get('base', 'port')
+
+# ======== Connect ==========
+try:
+    NAV_SORT_BY = config.get('connect', 'nav_sort_by')
+except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+    NAV_SORT_BY = 'ip'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -152,5 +164,6 @@ STATIC_URL = '/static/'
 BOOTSTRAP_COLUMN_COUNT = 10
 
 CRONJOBS = [
-    ('0 1 * * *', 'jasset.asset_api.asset_ansible_update_all')
+    ('0 1 * * *', 'jasset.asset_api.asset_ansible_update_all'),
+    ('*/10 * * * *', 'jlog.log_api.kill_invalid_connection'),
 ]
