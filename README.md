@@ -1,80 +1,64 @@
-## 写在前面
- - 版本号变更 2.0 -> 0.2版本 3.0 -> 0.3版本
+## Jumpserver
+Jumpserver是一款使用Python, Django开发的开源跳板机系统, 助力互联网企业高效 用户、资产、权限、审计 管理
 
-#欢迎使用Jumpserver
-**Jumpserver** 是一款由python编写开源的跳板机(堡垒机)系统，实现了跳板机应有的功能。基于ssh协议来管理，客户端无需安装agent。
-支持常见系统:
- 1. CentOS, RedHat, Fedora, Amazon Linux
- 2. Debian
- 3. SUSE, Ubuntu
- 4. FreeBSD
- 5. 其他ssh协议硬件设备
+### 环境
+   * Python 3.5  # 大部分功能兼容Python2.7
+   * Django 1.11
 
-###截图：
+### 安装
+使用docker compose 安装，一键完成，docker compose 安装见 docker官方
 
-首页
+   $ docker-compose up
+
+### 使用
+   1. 访问 http://你的主机IP:8080 来访问 Jumpserver
+   
+   2. 左侧 应用程序接受 Coco和Luna的注册
+   
+   3. 添加 管理用户
+   
+   4. 添加 资产 
+   
+   5. 添加授权规则，授权给admin
+   
+   6. ssh -p2222 admin@你的主机IP 测试连接服务器
  
-![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/index.jpg)
+   7. 访问 http://你的主机IP:5000 访问Luna，点击左侧服务器连接测试
+   
+   
+### 截图
 
-WebTerminal:
-
-![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/webTerminal.gif)
-
-Web批量执行命令
-
-![WebExecCommand](https://github.com/ibuler/static/raw/master/jumpserver3/webExec.gif)
-
-录像回放
-
-![录像](https://github.com/ibuler/static/raw/master/jumpserver3/record.gif)
-
-跳转和批量命令
-
-![跳转](https://github.com/ibuler/static/raw/master/jumpserver3/connect.gif)
-
-命令统计
-
-![跳转](https://github.com/ibuler/static/raw/master/jumpserver3/command.jpg)
-
-### 文档
-
-* [访问wiki](https://github.com/jumpserver/jumpserver/wiki)
-* [概览](https://github.com/jumpserver/jumpserver/wiki/%E6%A6%82%E8%A7%88)
-* [名词解释](https://github.com/jumpserver/jumpserver/wiki/%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A)
-* [常见问题](https://github.com/jumpserver/jumpserver/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)
-* 安装基于：[RedHat 的系统](https://github.com/jumpserver/jumpserver/wiki/%E5%9F%BA%E4%BA%8E-RedHat-%E7%9A%84%E7%B3%BB%E7%BB%9F)，[Debian 的系统](https://github.com/jumpserver/jumpserver/wiki/%E5%9F%BA%E4%BA%8E-Debian-%E7%9A%84%E7%B3%BB%E7%BB%9F)
-* [快速开始](https://github.com/jumpserver/jumpserver/wiki/%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B)
-* [安装图解](https://github.com/jumpserver/jumpserver/wiki/%E5%AE%89%E8%A3%85%E5%9B%BE%E8%A7%A3)
-* [应用图解](https://github.com/jumpserver/jumpserver/wiki/%E5%BA%94%E7%94%A8%E5%9B%BE%E8%A7%A3)
-
-### 特点
-
-* 完全开源，GPL授权
-* Python编写，容易再次开发
-* 实现了跳板机基本功能，认证、授权、审计
-* 集成了Ansible，批量命令等
-* 支持WebTerminal
-* Bootstrap编写，界面美观
-* 自动收集硬件信息
-* 录像回放
-* 命令搜索
-* 实时监控
-* 批量上传下载
-
-### 其它
-
-[Jumpserver官网](http://www.jumpserver.org)
-
-[论坛](http://bbs.jumpserver.org)
-
-[demo站点](http://demo.jumpserver.org)
-
-交流群: 399218702
-
-### 团队
-
-![](https://github.com/ibuler/static/raw/master/jumpserver3/team.jpg)
+参见 https://github.com/jumpserver/jumpserver/issues/438
 
 
+### Demo
 
+demo使用了开发者模式，并发只能为1 
+
+- Jumpserver: [访问](http://demo.jumpserver.org:8080)  账号: admin 密码: admin
+
+- Luna: [访问](http://demo.jumpserver.org:5000) 同Jumpserver认证
+
+- Coco: ssh -p 2222 admin@demo.jumpserver.org 密码: admin
+
+
+### 开发者文档
+
+
+   * [项目结构描述](https://github.com/jumpserver/jumpserver/blob/dev/docs/project_structure.md)
+   * [Python代码规范](https://github.com/jumpserver/jumpserver/blob/dev/docs/python_style_guide.md)
+   * [API设计规范](https://github.com/jumpserver/jumpserver/blob/dev/docs/api_style_guide.md)
+
+### 贡献者
+#### 0.4.0
+- ibuler <广宏伟>
+- 小彧 <李磊> Django资深开发者，为users模块贡献了很多代码
+- sofia <周小侠> 资深前端工程师, luna前端代码贡献者和现在维护者
+- liuz <刘正> 全栈工程师, 编写了luna大部分代码
+- jiaxiangkong <陈尚委> Jumpserver测试运营
+
+#### 0.3.2 
+- halcyon <王墉> DevOps 资深开发者, jassets开发者
+- yumaojun03 <喻茂峻> DevOps 资深开发者，jperm开发者，擅长Python, Go以及PAAS平台开发
+- kelianchun <柯连春> DevOps 资产开发者，fix了很多connect.py bug
 
